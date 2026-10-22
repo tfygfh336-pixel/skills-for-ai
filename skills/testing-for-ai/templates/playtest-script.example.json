@@ -1,0 +1,45 @@
+{
+  "_comment": "脚本化通关测试的骨架（拷进工程，如 <工程>/playtests/smoke.json）。判据：任一条 assert 不成立 ⇒ 进程 rc≠0 ⇒ 可当门禁用。格式来自 AuroraEngine 的 apps/playground/playtest.h；换引擎请按自己的步骤名改，但下面 6 条要点请保留。",
+  "_要点": [
+    "1. 判据写成对的：状态被本步改变时，先断『改变前』(expect:false) 再断『改变后』—— 只看后一半在『本来就已 true』时会假绿。",
+    "2. 样本别落在对称轴上：测朝向/映射时目标要斜着放 —— 错误实现常在与正确实现等价的点(如正前/正后)上完全一致。",
+    "3. 每一步都走真实链路：用『走到 X 旁边』这类高层动作(由真实输入实现)，不许瞬移或直调 API。",
+    "4. 超时要给足，但别靠超时兜底：把『没到达』分成『卡住』(连续 N 帧无推进)与『超时』两件事，报文里带上坐标。",
+    "5. 别断言绝对值(坐标/像素)：用相对量(位移≥、距离≤)与状态串，换场景也能用。",
+    "6. 一份脚本一个主题：smoke 只验链路通，别把『探索性』的断言混进来 —— 它会在无关改动时红。"
+  ],
+  "name": "smoke",
+  "steps": [
+    { "print": "① 起始态（断言『什么都没发生』也是一种判据）" },
+    { "frames": 30 },
+    { "assert": { "actionState": "idle" } },
+    { "assert": { "inDialogue": false } },
+
+    { "print": "② 用真实输入走一段，确认真的动了" },
+    { "mark": true },
+    { "key": "W", "down": true },
+    { "frames": 60 },
+    { "assert": { "actionState": "walk" } },
+    { "assert": { "moved": 1.0 } },
+    { "key": "W", "down": false },
+
+    { "print": "③ 走到目标旁边（高层动作 = 真实输入驱动，不是瞬移）" },
+    { "walkTo": { "npc": "<npc-id>", "range": 1.8, "timeout": 1800 } },
+    { "assert": { "nearTalkable": true } },
+    { "assert": { "talkableId": "<npc-id>" } },
+
+    { "print": "④ 交互链：按键 → 状态变化 → 数值变化（三条一起，缺一条就测不到效果）" },
+    { "talk": true },
+    { "assert": { "inDialogue": true } },
+    { "choose": 0 },
+    { "assert": { "questState": { "id": "<quest-id>", "state": "active" } } },
+    { "assert": { "questProgress": { "id": "<quest-id>", "objective": "<obj-id>", "count": 0 } } },
+
+    { "print": "⑤ 采集闭环：成对判据（前 false → 后 true）+ 计数口径必须跟着动" },
+    { "walkTo": { "interactable": "<interactable-id>", "range": 1.5, "timeout": 1200 } },
+    { "assert": { "interacted": { "id": "<interactable-id>", "expect": false } } },
+    { "interact": true },
+    { "assert": { "interacted": { "id": "<interactable-id>" } } },
+    { "assert": { "questProgress": { "id": "<quest-id>", "objective": "<obj-id>", "count": 1 } } }
+  ]
+}

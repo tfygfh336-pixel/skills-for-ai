@@ -1,0 +1,18 @@
+{
+  "_comment": "AI 读图产物样例（拷进工程的 .review/vision/ 目录）。由读图者（AI/人）填写，原子写落盘。哈希必须绑定当时那张 PNG，否则结论视为过期。",
+  "_numbersAreNotHandwritten": "本样例**故意不写数值**：smokeCount / resolution / sha256 必须在执行时**从取景记录机械读取**，并校验与当前 PNG 的 sha256 一致（SKILL B3）。写死样例数字会让它成为第二份会漂移的副本。",
+  "iteration": "<本次迭代的主题，如：详情框改版>",
+  "smokeCount": "<从取景记录读：本次冒烟的断言条数>",
+  "png": "smoke-shot.png",
+  "sha256": "<从取景记录读：当前 PNG 的 sha256>",
+  "resolution": "<从取景记录读：如 WxH>",
+  "checklist": {
+    "toolbar": { "verdict": "ok", "evidence": "保存/展开/收起/还原视图齐全，无错位" },
+    "mindmap": { "verdict": "ok", "evidence": "左右两棵树均渲染，连线无裁切" },
+    "detailBox": { "verdict": "unexpected", "evidence": "详情框标题栏缺少大锁按钮" },
+    "dialog": { "verdict": "ok", "evidence": "编辑节点弹窗字段完整（标题/标签/详情/展开）" },
+    "sidebar": { "verdict": "missing", "evidence": "本次未打开侧栏，不适用" }
+  },
+  "verdict": "unexpected",
+  "notes": "detailBox 的异常已开缺陷单；下次迭代复核该区域。missing 表示不适用，不是『不见了』。"
+}
